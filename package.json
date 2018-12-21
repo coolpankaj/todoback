@@ -1,0 +1,26 @@
+{
+  "name": "myback",
+  "version": "1.0.0",
+  "description": "this is todo list app backend",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^3.0.2",
+    "body-parser": "^1.18.3",
+    "cookie-parser": "^1.4.3",
+    "express": "^4.16.4",
+    "jsonwebtoken": "^8.4.0",
+    "moment": "^2.22.2",
+    "moment-timezone": "^0.5.23",
+    "mongoose": "^5.3.13",
+    "morgan": "^1.9.1",
+    "nodemailer": "^4.7.0",
+    "pino": "^5.9.0",
+    "shortid": "^2.2.14",
+    "socket.io": "^2.1.1"
+  }
+}
