@@ -345,7 +345,7 @@ let addListFunction = (req, res) => {
                 listCreatorName: req.body.listCreatorName,
                 listModifierId: req.body.listModifierId,
                 listModifierName: req.body.listModifierName,
-                listMode: req.body.listMode,
+                listMode: req.body.listMode.toLowerCase(),
                 listCreatedOn: time.now(),
                 listModifiedOn: time.now(),
             })
@@ -359,6 +359,8 @@ let addListFunction = (req, res) => {
                     reject(apiResponse)
                 } else {
                     let newListObj = newList.toObject();
+                    delete newListObj._id
+                    delete newListObj.__v
                     resolve(newListObj)
                 }
             })
