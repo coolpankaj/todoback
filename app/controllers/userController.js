@@ -55,8 +55,8 @@ let signUpFunction = (req, res) => {
                             userId: shortid.generate(),
                             firstName: req.body.firstName,
                             lastName: req.body.lastName || '',
-                            countryName: req.body.countryName,
-                            mobileNumber: req.body.mobileNumber,
+                            countryName: req.body.country,
+                            mobileNumber: req.body.mobile,
                             email: req.body.email.toLowerCase(),
                             password: passwordLib.hashpassword(req.body.password),
                             createdOn: time.now()
@@ -75,10 +75,10 @@ let signUpFunction = (req, res) => {
                                     email: newUserObj.email,
                                     name: newUserObj.firstName + ' ' + newUserObj.lastName,
                                     subject: 'Welcome to Todo ',
-                                    html: `<b> Dear ${newUserObj.firstName}</b><br>  
+                                    html: `<b> Dear ${newUserObj.firstName}</b><br>
                                         <br>Welcome to <b>Todo App</b> <br>
                                         Please click on following link to verify your account with Todo.<br>
-                                        <br> <a href="${baseUrl}/verifyEmail/${newUserObj.userId}">Click Here</a>                                     
+                                        <br> <a href="${baseUrl}/verifyEmail/${newUserObj.userId}">Click Here</a>
                                         `
                                 }
                                 setTimeout(() => {
@@ -111,22 +111,31 @@ let signUpFunction = (req, res) => {
 }
 
 let loginFunction = (req, res) => {
+    //console.log(req.body)
         let findUser = () => {
             return new Promise((resolve, reject) => {
                 if (req.body.email) {
                     // and: [{ email: req.body.email}, { emailVerified: true}]
-                    UserModel.findOne({  email: req.body.email }, (err, userDetails) => {
+                    //console.log(req.body.email);
+                    UserModel.findOne({$and: [{email: req.body.email},{ emailVerified: true}]}, (err, userDetails) => {
                             if (err) {
-                                logger.error('Failed to fetch user details', 'userController: loginFunction', 10 )
+                                // logger.error('Failed to fetch user details', 'userController: loginFunction', 10 )
                                 let apiResponse = response.generate(true, 'failed to find user details', 500, null)
-                                reject(apiResponse)
+                                //console.log('db error',userDetails);
+                                 reject(apiResponse)
                             } else if(check.isEmpty(userDetails)) {
-                                logger.error('No user found', 'usercontroller: loginFunction', 10)
+                                // logger.error('No user found', 'usercontroller: loginFunction', 10)
+                                //console.log('no user',userDetails)
                                 let apiResponse = response.generate(true, 'No user with this email or user email is not verified', 404, null)
                                 reject(apiResponse)
                             } else {
-                                logger.info('user found', 'usercontroler: loginFunction', 10)
+                                // logger.info('user found', 'usercontroler: loginFunction', 10)
+                                // resolve(userDetails)
+                                //next(userDetails)
+                                //console.log('user found',userDetails)
                                 resolve(userDetails)
+
+                               
                             }
                     })
                 } else {
@@ -138,30 +147,56 @@ let loginFunction = (req, res) => {
 
 
         let validatePassword = (userDetails) => {
-            console.log('vaildate password start')
+            //console.log('validate userdetail=>',userDetails)
+            //console.log('vaildate password start')
             return new Promise((resolve, reject) => {
-                passwordLib.comparePassword(req.body.password,userDetails.password, (err, isMatch) => {
-                    if (err) {
+              //here userdetails.password was null hence that console.error();
+                // passwordLib.comparePassword(req.body.password,userDetails[0].password, (err, isMatch) => {
+                //     if (err) {
+                //         console.log(err)
+                //         // logger.error(err.message, 'userController: validatePassword',10)
+                //         let apiResponse = response.generate(true, 'Login Failed', 500, null)
+                //         reject(apiResponse)
+                //     } else if (isMatch) {
+                //         let userDetailsObj = userDetails.toObject()
+                //         delete userDetailsObj.password
+                //         // delete userDetailsObj.userId
+                //         delete userDetailsObj.__v
+                //         delete userDetailsObj.createdOn
+                //         delete userDetailsObj.modifiedOn
+                //         delete userDetailsObj._id
+                //         resolve(userDetailsObj)
+                //     } else {
+                //         logger.info('Invalid Password', 'userController: validatePassword', 10)
+                //         let apiResponse = response.generate(true, 'Invalid Password', 400, null)
+                //         reject(apiResponse)
+                //     }
+                // })
+                passwordLib.comparePassword(req.body.password,userDetails.password)
+                    .then((isMatch)=>{
+                        if(isMatch){
+                            let userDetailsObj = userDetails.toObject()
+                            delete userDetailsObj.password
+                            // delete userDetailsObj.userId
+                            delete userDetailsObj.__v
+                            delete userDetailsObj.createdOn
+                            delete userDetailsObj.modifiedOn
+                            delete userDetailsObj._id
+                            resolve(userDetailsObj)
+                        }else{
+                            // logger.info('Invalid Password', 'userController: validatePassword', 10)
+                            let apiResponse = response.generate(true, 'Invalid Password', 400, null)
+                            reject(apiResponse)
+                        }
+                    })
+                    .catch((err)=>{
                         console.log(err)
-                        logger.error(err.message, 'userController: validatePassword',10)
+                        // logger.error(err.message, 'userController: validatePassword',10)
                         let apiResponse = response.generate(true, 'Login Failed', 500, null)
                         reject(apiResponse)
-                    } else if (isMatch) {
-                        let userDetailsObj = userDetails.toObject()
-                        delete userDetailsObj.password
-                        // delete userDetailsObj.userId
-                        delete userDetailsObj.__v
-                        delete userDetailsObj.createdOn
-                        delete userDetailsObj.modifiedOn
-                        delete userDetailsObj._id
-                        resolve(userDetailsObj)
-                    } else {
-                        logger.info('Invalid Password', 'userController: validatePassword', 10)
-                        let apiResponse = response.generate(true, 'Invalid Password', 400, null)
-                        reject(apiResponse)
-                    }
+                    })
+                   
                 })
-            })
         }
 
 
@@ -274,7 +309,7 @@ let loginFunction = (req, res) => {
     }
 
 
-      
+
 let resetPasswordFunction = (req, res) => {
     //finding user with email
     let findUser = () => {
@@ -334,7 +369,7 @@ let resetPasswordFunction = (req, res) => {
             let options = {
                 validationToken: tokenDetails.token
             }
-    
+
             UserModel.update({ email: req.body.email }, options).exec((err, result) => {
                 if (err) {
                     console.log(err)
@@ -342,7 +377,7 @@ let resetPasswordFunction = (req, res) => {
                     let apiResponse = response.generate(true, 'Failed To reset user Password', 500, null)
                     reject(apiResponse)
                 }  else {
-    
+
                     //let apiResponse = response.generate(false, 'Password reset successfully', 200, result)
                     resolve(result)
                     //Creating object for sending welcome email
@@ -354,22 +389,22 @@ let resetPasswordFunction = (req, res) => {
                             <p>
                                 We got a request to reset your password associated with this ${tokenDetails.userDetails.email} . <br>
                                 <br>Please use following link to reset your password. <br>
-                                <br> <a href="${baseUrl}/updatePassword/${options.validationToken}">Click Here</a>                                 
+                                <br> <a href="${baseUrl}/updatePassword/${options.validationToken}">Click Here</a>
                             </p>
-    
+
                             <br><b>Todo</b>
                                         `
                     }
-    
+
                     setTimeout(() => {
                         emailLib.sendEmail(sendEmailOptions);
                     }, 2000);
-    
+
                 }
             });// end user model update
-    
+
         });//end promise
-    
+
     }//end reset password
 
     //making promise call
@@ -527,7 +562,7 @@ let changePasswordFunction = (req, res) => {
         })
     }
 
-    //validate old password with database 
+    //validate old password with database
     let validatePassword = (retrievedUserDetails) => {
         console.log("validatePassword");
         console.log(retrievedUserDetails);
@@ -555,7 +590,7 @@ let changePasswordFunction = (req, res) => {
         })
     }
 
-    //password update 
+    //password update
     let passwordUpdate = (userDetails) => {
         return new Promise((resolve, reject) => {
 
@@ -591,7 +626,7 @@ let changePasswordFunction = (req, res) => {
                                     `
                     }
                     console.log(sendEmailOptions)
-                    
+
                     setTimeout(() => {
                         emailLib.sendEmail(sendEmailOptions);
                     }, 2000);
@@ -668,7 +703,7 @@ let verifyEmailFunction = (req, res) => {
                         resolve(result)
                     }
                 })
-        
+
             } else {
                 let apiResponse = response.generate(true, 'userId parameter is missing', 400, null)
                 reject(apiResponse)

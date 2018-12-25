@@ -1,34 +1,32 @@
-const bcrypt = require('bcrypt')
-const saltRounds = 10
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
 
-/* Custom Library */
-let logger = require('../libs/loggerLib')
-
-let hashpassword = (myPlaintextPassword) => {
-  let salt = bcrypt.genSaltSync(saltRounds)
-  let hash = bcrypt.hashSync(myPlaintextPassword, salt)
-  return hash
+let hashPassword = (plainPassword) => {
+    let salt = bcrypt.genSaltSync(saltRounds);
+    let hashedPass = bcrypt.hashSync(plainPassword, salt);
+    return hashedPass;
 }
 
+let comparePassword = (plainPassword, hashedPassword) => {
+    return new Promise((resolve, reject) => {
+        bcrypt.compare(plainPassword, hashedPassword)
+            .then((data) => {
+              console.log('working')
+              resolve(data)})
+            .catch((err) => reject(err));
+    })
 
-let comparePassword = (oldPassword, hashpassword, cb) => {
-  bcrypt.compare(oldPassword, hashpassword, (err, res) => {
-    if (err) {
-      logger.error(err.message, 'Comparison Error', 5)
-      cb(err, null)
-    } else {
-      cb(null, res)
-    }
-  })
 }
-
-
-let comparePasswordSync = (myPlaintextPassword, hash) => {
-  return bcrypt.compareSync(myPlaintextPassword, hash)
-}
-
+/* hashed = hashPassword('123456');
+console.log(hashed);
+comparePassword('12345', hashed)
+    .then((data) => {
+        console.log(data);
+    })
+    .catch((err) => {
+        console.log(err.message);
+    }) */
 module.exports = {
-  hashpassword: hashpassword,
-  comparePassword: comparePassword,
-  comparePasswordSync: comparePasswordSync
+    hashPassword,
+    comparePassword
 }
