@@ -56,7 +56,7 @@ let signUpFunction = (req, res) => {
                             countryName: req.body.country,
                             mobileNumber: req.body.mobile,
                             email: req.body.email.toLowerCase(),
-                            password: passwordLib.hashpassword(req.body.password),
+                            password: passwordLib.hashPassword(req.body.password),
                             createdOn: time.now()
                         })
 
@@ -68,7 +68,7 @@ let signUpFunction = (req, res) => {
                                 reject(apiResponse)
                             } else {
                                 let newUserObj = newUser.toObject();
-                                console.log(`${baseUrl}/verifyEmail/${newUserObj.userId}`)
+                                // console.log(`${baseUrl}/verifyEmail/${newUserObj.userId}`)
                                 let sendEmailOptions = {
                                     email: newUserObj.email,
                                     name: newUserObj.firstName + ' ' + newUserObj.lastName,
@@ -76,7 +76,7 @@ let signUpFunction = (req, res) => {
                                     html: `<b> Dear ${newUserObj.firstName}</b><br>
                                         <br>Welcome to <b>Todo App</b> <br>
                                         Please click on following link to verify your account with Todo.<br>
-                                        <br> <a href="${baseUrl}/verifyEmail/${newUserObj.userId}">Click Here</a>
+                                        <br> <a href="http://localhost:3000/api/v1/users/verify-email/${newUserObj.userId}">Click Here</a>
                                         `
                                 }
                                 setTimeout(() => {
@@ -346,7 +346,7 @@ let resetEmailFunction = (req, res) => {
         })
     }
     //reset password
-    let generateToken = (userDetails) => {
+/*     let generateToken = (userDetails) => {
         console.log("generate token to reset password");
         return new Promise((resolve, reject) => {
             token.generateToken(userDetails, (err, tokenDetails) => {
@@ -362,15 +362,16 @@ let resetEmailFunction = (req, res) => {
             })
         })
     }
-
-    let resetPassword = (tokenDetails) =>{
+ */
+    let resetPassword = (userDetails) =>{
         return new Promise((resolve, reject) => {
 
             let options = {
-                validationToken: tokenDetails.token
+               // validationToken: tokenDetails.token
+               validationToken: shortid.generate()
             }
 
-            UserModel.update({ email: req.body.email }, options).exec((err, result) => {
+            UserModel.updateOne({ email: req.body.email }, options).exec((err, result) => {
                 if (err) {
                     console.log(err)
                     logger.error(err.message, 'User Controller:resetPasswordFunction', 10)
@@ -384,42 +385,28 @@ let resetEmailFunction = (req, res) => {
                     //console.log(tokenDetails)
                    
                     let sendEmailOptions = {
-                        email: tokenDetails.userDetails.email,
+                        //email: tokenDetails.userDetails.email,
+                        email: userDetails.email,
                         subject: 'Reset Password for Todo ',
-                        html: `<!DOCTYPE html>
-                        <html>
-                        <head>
-                        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-                        </head>
-                        <body>
-                        <h4> Hi ${tokenDetails.userDetails.firstName}  ${tokenDetails.userDetails.lastName}</h4>
+                        html: `<h4> Hi ${userDetails.firstName}  ${userDetails.lastName}</h4>
                             <p>
-                                We got a request to reset your password associated with this ${tokenDetails.userDetails.email}
+                                We got a request to reset your password associated with this ${userDetails.email}
                                 <br>Please use key to reset your password. <br>
-                                <br> <br><b>Secret Key:<b>
-                               <textarea name="secret" id="secret">${options.validationToken}</textarea>
-                               <button onclick="myFunction(#secret)">Copy text</button>
-                            </p>
-                            <script>
-                           function myFunction(element) {
-                            var $temp = $("<textarea>");
-                            $("body").append($temp);
-                            $temp.val($(element).text()).select();
-                            document.execCommand("copy");
-                            $temp.remove();
-                           }
-                            </script>
-
+                                <br>
+                                <b>Secret Key:<b>
+                                <br>   
+                                <span style="font-size:23px;font-weight:lighter;">${options.validationToken} </span>                                                        
+                              </p>                                      
+                         
                             <br><b>Todo</b>
-                            </body>
-                            </html>
+                            
                                         `
                                         // <a href="http://localhost:3000/api/v1/users/updatePassword/${options.validationToken}">Click Here</a>
                     }
 
                     setTimeout(() => {
                         emailLib.sendEmail(sendEmailOptions);
-                    }, 1000);
+                    }, 2000);
 
                 }
             });// end user model update
@@ -430,7 +417,7 @@ let resetEmailFunction = (req, res) => {
 
     //making promise call
     findUser(req, res)
-        .then(generateToken)
+       // .then(generateToken)
         .then(resetPassword)
         .then((resolve) => {
             let apiResponse = response.generate(false, 'Password reset instructions sent successfully', 200, 'None')
@@ -488,7 +475,7 @@ let updatePasswordFunction = (req, res) => {
         return new Promise((resolve, reject) => {
 
             let options = {
-                password: passwordLib.hashpassword(req.body.password),
+                password: passwordLib.hashPassword(req.body.password),
                 validationToken:''
             }
 
@@ -759,13 +746,13 @@ let verifyEmailFunction = (req, res) => {
         .then(verifyEmail)
         .then((resolve) => {
             let apiResponse = response.generate(false, 'User email Verified', 200, resolve)
-            res.status(200)
-            res.send(apiResponse)
+            //res.status(200)
+            res.send('Email Verified, Now you can login')
         })
         .catch((err) => {
             console.log("errorhandler");
             console.log(err);
-            res.status(err.status)
+            //res.status(err.status)
             res.send(err)
         })
 }

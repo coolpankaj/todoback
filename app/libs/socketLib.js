@@ -18,6 +18,7 @@ let setServer = (server) => {
         console.log("on connection--emitting verify user");
 
         socket.emit("verifyUser", "");
+        console.log('verify-user emitted from backend')
 
         // code to verify the user and make him online
 

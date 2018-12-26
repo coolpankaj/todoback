@@ -33,7 +33,7 @@ module.exports.setRouter = (app) => {
     app.put(`${baseUrl}/:userId/edit`, auth.isAuthorized, userController.editUser)
 
     // params: userId.
-    app.put(`${baseUrl}/verifyEmail/:userId`, userController.verifyEmailFunction)
+    app.get(`${baseUrl}/verify-email/:userId`, userController.verifyEmailFunction)
 
     // params: userId.
     app.post(`${baseUrl}/:userId/delete`, auth.isAuthorized, userController.deleteUser)

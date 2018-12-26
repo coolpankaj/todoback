@@ -25,6 +25,6 @@ comparePassword('12345', hashed)
         console.log(err.message);
     }) */
 module.exports = {
-    hashPassword,
-    comparePassword
+    hashPassword: hashPassword,
+    comparePassword: comparePassword
 }
