@@ -18,12 +18,15 @@ module.exports.setRouter = (app) => {
     app.post(`${baseUrl}/:userId/logout`, auth.isAuthorized, userController.logout)
 
     // body params: email.
-    app.post(`${baseUrl}/resetPassword`, userController.resetPasswordFunction)
+    // generate reset password link only
+    app.post(`${baseUrl}/reset-link`, userController.resetEmailFunction)
     
     // params: validationToken,password.
-    app.put(`${baseUrl}/updatePassword/:validationToken`, userController.updatePasswordFunction)
+    app.post(`${baseUrl}/update-password`, userController.updatePasswordFunction)
 
     // body params: userId, oldPassword,newPassword.
+    // this is simple change password witout email ,when does this execute?
+    // after user login , if he want to change password
     app.post(`${baseUrl}/changePassword`, auth.isAuthorized,userController.changePasswordFunction)
 
     // params: userId.

@@ -12,7 +12,7 @@ const emailLib = require('./../libs/emailLib');
 const UserModel = mongoose.model('User');
 const applicationUrl = '';
 const appConfig = require('./../../config/appConfig');
-const baseUrl = `${appConfig.apiVersion}/users`;
+// const baseUrl = `${appConfig.apiVersion}/users`;
 
 
 let signUpFunction = (req, res) => {
@@ -41,9 +41,7 @@ let signUpFunction = (req, res) => {
 
     let createUser = () => {
         return new Promise((resolve, reject) => {
-            UserModel.findOne({
-                    email: req.body.email
-                })
+            UserModel.findOne({ email: req.body.email })
                 .exec((err, retreivedUserDetails) => {
                     if (err) {
                         logger.error(err.message, 'userController: createUser', 10)
@@ -115,7 +113,7 @@ let loginFunction = (req, res) => {
         let findUser = () => {
             return new Promise((resolve, reject) => {
                 if (req.body.email) {
-                    // and: [{ email: req.body.email}, { emailVerified: true}]
+                    // $and: [{ email: req.body.email}, { emailVerified: true}]
                     //console.log(req.body.email);
                     UserModel.findOne({$and: [{email: req.body.email},{ emailVerified: true}]}, (err, userDetails) => {
                             if (err) {
@@ -125,14 +123,14 @@ let loginFunction = (req, res) => {
                                  reject(apiResponse)
                             } else if(check.isEmpty(userDetails)) {
                                 // logger.error('No user found', 'usercontroller: loginFunction', 10)
-                                //console.log('no user',userDetails)
+                                // console.log('no user',userDetails)
                                 let apiResponse = response.generate(true, 'No user with this email or user email is not verified', 404, null)
                                 reject(apiResponse)
                             } else {
                                 // logger.info('user found', 'usercontroler: loginFunction', 10)
                                 // resolve(userDetails)
                                 //next(userDetails)
-                                //console.log('user found',userDetails)
+                                // console.log('user found',userDetails)
                                 resolve(userDetails)
 
                                
@@ -175,6 +173,7 @@ let loginFunction = (req, res) => {
                 passwordLib.comparePassword(req.body.password,userDetails.password)
                     .then((isMatch)=>{
                         if(isMatch){
+                            console.log('password matched !!')
                             let userDetailsObj = userDetails.toObject()
                             delete userDetailsObj.password
                             // delete userDetailsObj.userId
@@ -283,8 +282,9 @@ let loginFunction = (req, res) => {
         .catch((err) => {
             console.log("errorhandler");
             console.log(err);
-            res.status(err.status)
+            //res.status(err.status)
             res.send(err)
+            
         })
 
     }
@@ -310,7 +310,7 @@ let loginFunction = (req, res) => {
 
 
 
-let resetPasswordFunction = (req, res) => {
+let resetEmailFunction = (req, res) => {
     //finding user with email
     let findUser = () => {
         console.log("findUser start");
@@ -381,24 +381,45 @@ let resetPasswordFunction = (req, res) => {
                     //let apiResponse = response.generate(false, 'Password reset successfully', 200, result)
                     resolve(result)
                     //Creating object for sending welcome email
-                    console.log(tokenDetails)
+                    //console.log(tokenDetails)
+                   
                     let sendEmailOptions = {
                         email: tokenDetails.userDetails.email,
                         subject: 'Reset Password for Todo ',
-                        html: `<h4> Hi ${tokenDetails.userDetails.firstName}  ${tokenDetails.userDetails.lastName}</h4>
+                        html: `<!DOCTYPE html>
+                        <html>
+                        <head>
+                        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+                        </head>
+                        <body>
+                        <h4> Hi ${tokenDetails.userDetails.firstName}  ${tokenDetails.userDetails.lastName}</h4>
                             <p>
-                                We got a request to reset your password associated with this ${tokenDetails.userDetails.email} . <br>
-                                <br>Please use following link to reset your password. <br>
-                                <br> <a href="${baseUrl}/updatePassword/${options.validationToken}">Click Here</a>
+                                We got a request to reset your password associated with this ${tokenDetails.userDetails.email}
+                                <br>Please use key to reset your password. <br>
+                                <br> <br><b>Secret Key:<b>
+                               <textarea name="secret" id="secret">${options.validationToken}</textarea>
+                               <button onclick="myFunction(#secret)">Copy text</button>
                             </p>
+                            <script>
+                           function myFunction(element) {
+                            var $temp = $("<textarea>");
+                            $("body").append($temp);
+                            $temp.val($(element).text()).select();
+                            document.execCommand("copy");
+                            $temp.remove();
+                           }
+                            </script>
 
                             <br><b>Todo</b>
+                            </body>
+                            </html>
                                         `
+                                        // <a href="http://localhost:3000/api/v1/users/updatePassword/${options.validationToken}">Click Here</a>
                     }
 
                     setTimeout(() => {
                         emailLib.sendEmail(sendEmailOptions);
-                    }, 2000);
+                    }, 1000);
 
                 }
             });// end user model update
@@ -413,13 +434,13 @@ let resetPasswordFunction = (req, res) => {
         .then(resetPassword)
         .then((resolve) => {
             let apiResponse = response.generate(false, 'Password reset instructions sent successfully', 200, 'None')
-            res.status(200)
+            //res.status(200)
             res.send(apiResponse)
         })
         .catch((err) => {
             console.log("errorhandler");
             console.log(err);
-            res.status(err.status)
+            //res.status(err.status)
             res.send(err)
         })
 
@@ -430,11 +451,12 @@ let updatePasswordFunction = (req, res) => {
 
     let findUser = () => {
         console.log("findUser");
+        // need validation token and password as body parameter
         return new Promise((resolve, reject) => {
-            if (req.params.validationToken) {
+            if (req.body.validationToken) {
                 console.log("req body validationToken is there");
                 console.log(req.body);
-                UserModel.findOne({ validationToken: req.params.validationToken }, (err, userDetails) => {
+                UserModel.findOne({ validationToken: req.body.validationToken }, (err, userDetails) => {
                     /* handle the error here if the User is not found */
                     if (err) {
                         console.log(err)
@@ -456,7 +478,7 @@ let updatePasswordFunction = (req, res) => {
                 });
 
             } else {
-                let apiResponse = response.generate(true, '"validationToken" parameter is missing', 400, null)
+                let apiResponse = response.generate(true, 'validationToken parameter is missing', 400, null)
                 reject(apiResponse)
             }
         })
@@ -512,14 +534,14 @@ let updatePasswordFunction = (req, res) => {
     findUser(req, res)
         .then(passwordUpdate)
         .then((resolve) => {
-            let apiResponse = response.generate(false, 'Password Update Successfully', 200, null)
-            res.status(200)
+            let apiResponse = response.generate(false, 'Auth Token verified successfully', 200, null)
+            //res.status(200)
             res.send(apiResponse)
         })
         .catch((err) => {
             console.log("errorhandler");
             console.log(err);
-            res.status(err.status)
+            //res.status(err.status)
             res.send(err)
         })
 
@@ -818,7 +840,7 @@ module.exports = {
     signUpFunction: signUpFunction,
     loginFunction: loginFunction,
     logout: logout,
-    resetPasswordFunction: resetPasswordFunction,
+    resetEmailFunction: resetEmailFunction,
     updatePasswordFunction: updatePasswordFunction,
     changePasswordFunction: changePasswordFunction,
     editUser: editUser,

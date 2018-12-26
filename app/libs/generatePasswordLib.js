@@ -10,9 +10,7 @@ let hashPassword = (plainPassword) => {
 let comparePassword = (plainPassword, hashedPassword) => {
     return new Promise((resolve, reject) => {
         bcrypt.compare(plainPassword, hashedPassword)
-            .then((data) => {
-              console.log('working')
-              resolve(data)})
+            .then((data) => {resolve(data)})
             .catch((err) => reject(err));
     })
 
