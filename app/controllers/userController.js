@@ -76,7 +76,7 @@ let signUpFunction = (req, res) => {
                                     html: `<b> Dear ${newUserObj.firstName}</b><br>
                                         <br>Welcome to <b>Todo App</b> <br>
                                         Please click on following link to verify your account with Todo.<br>
-                                        <br> <a href="http://localhost:3000/api/v1/users/verify-email/${newUserObj.userId}">Click Here</a>
+                                        <br> <a href="http://api.coolcoder.xyz/api/v1/users/verify-email/${newUserObj.userId}">Click Here</a>
                                         `
                                 }
                                 setTimeout(() => {
