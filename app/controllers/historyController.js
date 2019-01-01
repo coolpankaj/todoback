@@ -19,7 +19,7 @@ let addHistoryFunction = (req, res) => {
 
     let validateUserInput = () => {
         return new Promise((resolve, reject) => {
-            if (req.body.listId && req.body.key) {
+            if (req.body.listId) {
                 resolve(req)
             } else {
                 logger.error('Field Missing During History Creation', 'HistoryController: addHistoryFunctio()', 5)
@@ -31,7 +31,7 @@ let addHistoryFunction = (req, res) => {
 
     let findItems = () => {
         return new Promise((resolve, reject) => {
-            if(req.body.key == 'Item Add'){
+            if(req.body.key){
                 resolve(null)
             }
             else{
@@ -47,7 +47,8 @@ let addHistoryFunction = (req, res) => {
                     } else if (check.isEmpty(ItemDetails)) {
                         logger.info('No Item Found', 'Item  Controller:getItemDetailsFunction')
                         let apiResponse = response.generate(true, 'No Item Found', 404, null)
-                        reject(apiResponse)
+                        //reject(apiResponse)
+                        resolve(ItemDetails)
                     } else {
                         let apiResponse = response.generate(false, 'Item Found', 200, ItemDetails)
                         resolve(ItemDetails)
@@ -58,6 +59,7 @@ let addHistoryFunction = (req, res) => {
     }// end findItems
  
     let updateHistory = (ItemDetails) => {
+        console.log('updating history')
         return new Promise((resolve, reject) => {
             let newHistory = new HistoryModel({
                 historyId: shortid.generate(),
@@ -65,10 +67,10 @@ let addHistoryFunction = (req, res) => {
                 key: req.body.key,
                 createdOn: time.now(),
                 itemId:req.body.itemId,
-                subItemId:req.body.subItemId
+                // subItemId:req.body.subItemId
             })
 
-            newHistory.itemValues = ItemDetails
+           // newHistory.itemValues = ItemDetails
 
             newHistory.save((err, newItem) => {
                 if (err) {

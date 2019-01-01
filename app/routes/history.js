@@ -33,10 +33,8 @@ module.exports.setRouter = (app) => {
             "data": [
                 {
                     "_id": "5bc88c95ecfe471824759870",
-                    "createdOn": "2018-10-18T13:37:25.000Z",
-                    "itemValues": null,
-                    "key": "Item Add",
-                    "subItemId": "undefined",
+                    "createdOn": "2018-12-18T13:37:25.000Z",                    
+                    "key": "Item Add",                    
                     "itemId": "S1RqhZ8jQ",
                     "listId": "SkHeBWUo7",
                     "historyId": "B1xCqnWIiX",
@@ -67,10 +65,8 @@ module.exports.setRouter = (app) => {
             "data": [
                 {
                     "_id": "5bc88c95ecfe471824759870",
-                    "createdOn": "2018-10-18T13:37:25.000Z",
-                    "itemValues": null,
-                    "key": "Item Add",
-                    "subItemId": "undefined",
+                    "createdOn": "2018-12-18T13:37:25.000Z",
+                    "key": null,
                     "itemId": "S1RqhZ8jQ",
                     "listId": "SkHeBWUo7",
                     "historyId": "B1xCqnWIiX",

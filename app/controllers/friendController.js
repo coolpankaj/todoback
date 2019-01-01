@@ -145,7 +145,7 @@ let sendFriendRequest = (req, res) => {
         .catch((err) => {
             console.log("errorhandler");
             console.log(err);
-            res.status(err.status)
+           // res.status(err.status)
             res.send(err)
         })
 }

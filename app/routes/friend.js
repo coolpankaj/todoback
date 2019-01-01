@@ -30,7 +30,7 @@ module.exports.setRouter = (app) => {
                     "friendRequestSent": [
                         {
                             "friendId": "SkBEHfS97",
-                            "friendName": "Shahrukh Sayyed",
+                            "friendName": "pankaj singh",
                             "_id": "5bb8a427bf63d9156cae71e6"
                         }
                     ]
@@ -62,7 +62,7 @@ module.exports.setRouter = (app) => {
                 "friendRequestRecieved": [
                     {
                         "friendId": "SJ70bQL97",
-                        "friendName": "Ahtesham Sayyed",
+                        "friendName": "brother singh",
                         "_id": "5bb8a427bf63d9156cae71e7"
                     }
                 ]

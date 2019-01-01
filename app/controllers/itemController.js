@@ -21,6 +21,7 @@ let getAllItemsFunction = (req, res) => {
             ListModel.findOne({
                     listId: req.params.listId
                 })
+                
                 .select()
                 .lean()
                 .exec((err, listDetails) => {
@@ -388,14 +389,15 @@ let getSubItemDetailsFunction = (req, res) => {
 
     let findSubItemDetails = (ItemDetails) => {
         return new Promise((resolve, reject) => {
-            ItemModel.find({
+           /*  ItemModel.find({
                     subItems: {
                         $elemMatch: {
                             subItemId: req.body.subItemId
                         }
                     }
-                })
-                .select('subItems')
+                }) */
+                ItemModel.findOne({ "subItems.subItemId": req.body.subItemId })
+                //.select('subItems')
                 .lean()
                 .exec((err, SubItemDetails) => {
                     if (err) {
@@ -677,9 +679,7 @@ let updateSubItemFunction = (req, res) => {
 
 
 
-                ItemModel.update({
-                    'itemId': req.params.itemId,
-                    'subItems.subItemId': req.body.subItemId
+                ItemModel.update({itemId: req.params.itemId, subItems: { subItemId: req.body.subItemId }
                 }, options).exec((err, result) => {
                     if (err) {
                         console.log(err)
