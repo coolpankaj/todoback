@@ -38,7 +38,7 @@ These following will allow you to use this project in proper way.
    ```bash
    npm i
    ```
-   Run the command to run project in default browser.
+   Run the command to run project in terminal.
    ```bash
    node index.js
    ```
