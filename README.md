@@ -40,7 +40,7 @@ These following will allow you to use this project in proper way.
    ```
    Run the command to run project in default browser.
    ```bash
-   ng serve --open
+   node index.js
    ```
 
 ## More about the application
